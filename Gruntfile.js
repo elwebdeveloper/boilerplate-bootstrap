@@ -51,7 +51,7 @@ module.exports = function(grunt) {
     },
 
     // Regex for refactor task.
-    replacements: require('./tasks/replacements'),
+    replacements: require('./tasks/replacements.3.1.0'),
 
     // Refactor Liquid to Handlebars so we can
     // build with Assemble instead of Jekyll
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
           replacements: '<%= replacements.bootstrap %>'
         },
         files: [
-          {expand: true, cwd: '<%= bootstrap %>', src: ['*.html', '_layouts/*.html', '_includes/*.html'], dest: 'templates/', ext: '.hbs'}
+          {expand: true, cwd: '<%= bootstrap %>/docs', src: ['*.html', '_layouts/*.html', '_includes/{,*/}*.html'], dest: 'templates/', ext: '.hbs'}
         ]
       },
       examples: {
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
           replacements: '<%= replacements.examples %>'
         },
         files: [
-          {expand: true, filter: 'isFile', cwd: '<%= bootstrap %>/examples', src: ['{*,**}/*.html'], dest: '<%= site.dest %>/examples/'}
+          {expand: true, filter: 'isFile', cwd: '<%= bootstrap %>/docs/examples', src: ['{*,**}/*.{html,css}'], dest: '<%= site.dest %>/examples/'}
         ]
       }
     },
@@ -86,10 +86,38 @@ module.exports = function(grunt) {
         // Templates
         partials: '<%= site.includes %>',
         layoutdir: '<%= site.layouts %>',
-        layout: '<%= site.layout %>',
+        layout: '<%= site.layout %>'
       },
       site: {
-        src: ['templates/*.hbs'],
+        src: ['templates/index.hbs', 'templates/about.hbs', 'templates/browser-bugs.hbs'/*, 'templates/migration.hbs'*/],
+        dest: '<%= site.dest %>/'
+      },
+      css: {
+        options: {
+          partials: 'templates/_includes/css/*.hbs'
+        },
+        src: ['templates/css.hbs'],
+        dest: '<%= site.dest %>/'
+      },
+      components: {
+        options: {
+          partials: 'templates/_includes/components/*.hbs'
+        },
+        src: ['templates/components.hbs'],
+        dest: '<%= site.dest %>/'
+      },
+      js: {
+        options: {
+          partials: 'templates/_includes/js/*.hbs'
+        },
+        src: ['templates/javascript.hbs'],
+        dest: '<%= site.dest %>/'
+      },
+      gettingstarted: {
+        options: {
+          partials: 'templates/_includes/getting-started/*.hbs'
+        },
+        src: ['templates/getting-started.hbs'],
         dest: '<%= site.dest %>/'
       }
     },
@@ -103,7 +131,7 @@ module.exports = function(grunt) {
           '<%= site.theme %>/bootstrap',
           '<%= site.theme %>/components',
           '<%= site.theme %>/utils'
-        ],
+        ]
       },
       site: {
         src: ['<%= site.theme %>/site.less'],
@@ -121,8 +149,8 @@ module.exports = function(grunt) {
       },
       assets: {
         files: [
-          {expand: true, cwd: '<%= bootstrap %>/examples', src: ['**/*.css', '**/*.{jpg,png,gif}'], dest: '<%= site.dest %>/examples/'},
-          {expand: true, cwd: '<%= bootstrap %>/docs-assets', src: ['**'], dest: '<%= site.assets %>/'},
+          {expand: true, cwd: '<%= bootstrap %>/docs/examples', src: ['**/*.css', '**/*.{jpg,png,gif}'], dest: '<%= site.dest %>/examples/'},
+          {expand: true, cwd: '<%= bootstrap %>/docs/assets', src: ['**'], dest: '<%= site.assets %>/'},
           {expand: true, cwd: '<%= bootstrap %>/_data', src: ['**'], dest: '<%= site.data %>/'},
           {expand: true, cwd: '<%= bootstrap %>/dist', src: ['**'], dest: '<%= site.assets %>/'},
         ]
@@ -130,7 +158,7 @@ module.exports = function(grunt) {
       update: {
         files: [
           {expand: true, cwd: '<%= bootstrap %>/less', src: ['*', '!{var*,mix*,util*}'], dest: '<%= site.theme %>/bootstrap/'},
-          {expand: true, cwd: '<%= bootstrap %>/less', src: ['{util*,mix*}.less'], dest: '<%= site.theme %>/utils'},
+          {expand: true, cwd: '<%= bootstrap %>/less', src: ['{util*,mix*{,*/*}}.less'], dest: '<%= site.theme %>/utils'},
           {expand: true, cwd: '<%= bootstrap %>/less', src: ['variables.less'], dest: '<%= site.theme %>/'},
         ]
       }
@@ -170,8 +198,8 @@ module.exports = function(grunt) {
     'subgrunt:css',
     'copy',
     'frep',
-    'assemble',
     'less',
+    'assemble',
     'sync'
   ]);
 };
